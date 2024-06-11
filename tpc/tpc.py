@@ -255,7 +255,7 @@ def _subcommand_stop():
 
 
 def _subcommand_reboot():
-    _ssh_run_command(f'sudo reboot')
+    _ssh_run_command(f'tmux new-session -d -s reboot sudo reboot')
 
 
 def _subcommand_debug():
