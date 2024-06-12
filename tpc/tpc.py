@@ -2,6 +2,7 @@ import os
 import subprocess
 import re
 import tempfile
+import time
 from absl.flags import argparse_flags
 import mlxu
 
@@ -45,7 +46,7 @@ def _execute_shell(cmd, print_output=True):
         print(f'Running command: \n{cmd}\n')
     process = subprocess.Popen(
         cmd,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True,
         env=os.environ,
     )
     output_lines = []
@@ -73,6 +74,7 @@ def _subcommand_list():
         f'gcloud compute tpus tpu-vm list '
         f'--zone={FLAGS.zone} '
         f'--project={FLAGS.project} '
+        f'--quiet '
     )
 
 
@@ -90,6 +92,7 @@ def _subcommand_create():
         f'--project={FLAGS.project} '
         f'--version={FLAGS.runtime_version} '
         f'--accelerator-type={FLAGS.accelerator_type} '
+        f'--quiet '
     )
 
 
@@ -115,6 +118,7 @@ def _subcommand_queue():
         f'--project={FLAGS.project} '
         f'--accelerator-type={FLAGS.accelerator_type} '
         f'--runtime-version={FLAGS.runtime_version} '
+        f'--quiet '
         f'{resource_type_flag}'
     )
 
@@ -128,6 +132,21 @@ def _subcommand_ls_queue():
         f'gcloud alpha compute tpus queued-resources list '
         f'--zone={FLAGS.zone} '
         f'--project={FLAGS.project} '
+        f'--quiet '
+    )
+
+
+def _subcommand_del_queue():
+    _assert_flags(
+        name=True,
+        zone=True,
+        project=True,
+    )
+    _execute_shell(
+        f'gcloud alpha compute tpus queued-resources delete {FLAGS.name} '
+        f'--zone={FLAGS.zone} '
+        f'--project={FLAGS.project} '
+        f'--quiet '
     )
 
 
@@ -141,6 +160,7 @@ def _subcommand_describe():
         f'gcloud compute tpus tpu-vm describe {FLAGS.name} '
         f'--zone={FLAGS.zone} '
         f'--project={FLAGS.project} '
+        f'--quiet '
     )
 
 
@@ -153,7 +173,8 @@ def _get_tpu_ips():
     _, output = _execute_shell(
         f'gcloud compute tpus tpu-vm describe {FLAGS.name} '
         f'--zone={FLAGS.zone} '
-        f'--project={FLAGS.project} ',
+        f'--project={FLAGS.project} '
+        f'--quiet ',
         print_output=False,
     )
 
@@ -183,6 +204,7 @@ def _subcommand_upload():
             f'{FLAGS.tpu_user}@{FLAGS.name}:{remote_path} '
             f'--recurse '
             f'--worker=all '
+            f'--quiet '
             f'--zone={FLAGS.zone} '
             f'--project={FLAGS.project} '
         )
@@ -201,6 +223,7 @@ def _ssh_run_command(command):
         f'--zone={FLAGS.zone} '
         f'--project={FLAGS.project} '
         f'--worker=all '
+        f'--quiet '
         f'--command="{command}" '
     )
 
@@ -222,15 +245,17 @@ def _subcommand_launch():
         launch_script=True,
         launch_script_remote_path=True,
     )
-    with tempfile.NamedTemporaryFile(model='w') as f:
+    with tempfile.NamedTemporaryFile(mode='w') as f:
         f.write(FLAGS.launch_script)
         f.flush()
-
+        os.chmod(f.name, 0o755)
+        _ssh_run_command(f'rm -f {FLAGS.launch_script_remote_path}')
         _execute_shell(
             f'gcloud alpha compute tpus tpu-vm scp '
             f'{f.name} '
             f'{FLAGS.tpu_user}@{FLAGS.name}:{FLAGS.launch_script_remote_path} '
             f'--worker=all '
+            f'--quiet '
             f'--zone={FLAGS.zone} '
             f'--project={FLAGS.project} '
         )
@@ -258,11 +283,6 @@ def _subcommand_reboot():
     _ssh_run_command(f'tmux new-session -d -s reboot sudo reboot')
 
 
-def _subcommand_debug():
-    _execute_shell(
-        f'gcloud help'
-    )
-
 
 def main(args):
     if args.config_file != '':
@@ -289,8 +309,6 @@ def main(args):
 
 
     match args.action:
-        case 'debug':
-            _subcommand_debug()
         case 'list':
             _subcommand_list()
         case 'create':
@@ -299,6 +317,8 @@ def main(args):
             _subcommand_queue()
         case 'ls_queue':
             _subcommand_ls_queue()
+        case 'del_queue':
+            _subcommand_del_queue()
         case 'describe':
             _subcommand_describe()
         case 'ips':
@@ -315,6 +335,10 @@ def main(args):
             _subcommand_stop()
         case 'reboot':
             _subcommand_reboot()
+        case 'upload+launch':
+            _subcommand_upload()
+            time.sleep(2)
+            _subcommand_launch()
 
 
 
@@ -332,6 +356,7 @@ def _parse_flags(argv):
             'create',
             'queue',
             'ls_queue',
+            'del_queue',
             'describe',
             'ips',
             'upload',
@@ -340,6 +365,7 @@ def _parse_flags(argv):
             'check',
             'stop',
             'reboot',
+            'upload+launch'
         ],
         help='Action to execute',
     )
@@ -354,6 +380,10 @@ def _parse_flags(argv):
     return parser.parse_args(argv[1:])
 
 
-if __name__ == '__main__':
+def run_tpc():
     mlxu.run(main, flags_parser=_parse_flags)
+
+
+if __name__ == '__main__':
+    run_tpc()
 
