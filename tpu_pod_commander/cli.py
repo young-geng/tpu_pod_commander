@@ -380,10 +380,10 @@ def _parse_flags(argv):
     return parser.parse_args(argv[1:])
 
 
-def run_tpc():
+def run_cli():
     mlxu.run(main, flags_parser=_parse_flags)
 
 
 if __name__ == '__main__':
-    run_tpc()
+    run_cli()
 
