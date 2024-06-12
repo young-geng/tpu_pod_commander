@@ -96,6 +96,20 @@ def _subcommand_create():
     )
 
 
+def _subcommand_delete():
+    _assert_flags(
+        zone=True,
+        project=True,
+        name=True,
+    )
+    _execute_shell(
+        f'gcloud alpha compute tpus tpu-vm delete {FLAGS.name} '
+        f'--zone={FLAGS.zone} '
+        f'--project={FLAGS.project} '
+        f'--quiet '
+    )
+
+
 def _subcommand_queue():
     assert not FLAGS.reserved or not FLAGS.spot, "Cannot specify both reserved and spot"
     resource_type_flag = ''
@@ -136,7 +150,7 @@ def _subcommand_ls_queue():
     )
 
 
-def _subcommand_del_queue():
+def _subcommand_cancel_queue():
     _assert_flags(
         name=True,
         zone=True,
@@ -313,12 +327,14 @@ def main(args):
             _subcommand_list()
         case 'create':
             _subcommand_create()
+        case 'delete':
+            _subcommand_delete()
         case 'queue':
             _subcommand_queue()
         case 'ls_queue':
             _subcommand_ls_queue()
-        case 'del_queue':
-            _subcommand_del_queue()
+        case 'cancel_queue':
+            _subcommand_cancel_queue()
         case 'describe':
             _subcommand_describe()
         case 'ips':
@@ -351,12 +367,12 @@ def _parse_flags(argv):
         "action",
         type=str,
         choices=[
-            'debug',
             'list',
             'create',
+            'delete',
             'queue',
             'ls_queue',
-            'del_queue',
+            'cancel_queue',
             'describe',
             'ips',
             'upload',
