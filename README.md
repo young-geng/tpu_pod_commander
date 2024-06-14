@@ -14,7 +14,7 @@ pip install tpu_pod_commander
 After installing TPU Pod Commander, the command `tpc` will be available in your
 shell. TPC commands are all organized in the following format:
 ```bash
-tpc <action> --flags1=value1 config_file.py
+tpc <action> [config_file.py] [--flags=value ...]
 ```
 where `<action>` is the action to perform, and paramters are specified jointly
 by the optional config file and the flags. There is a one-to-one correspondence
