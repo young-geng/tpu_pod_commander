@@ -283,7 +283,7 @@ def _subcommand_check():
     _assert_flags(
         tmux_session_name=True,
     )
-    _ssh_run_command('tmux capture-pane -pt {FLAGS.tmux_session_name} -S -2000')
+    _ssh_run_command(f'tmux capture-pane -pt {FLAGS.tmux_session_name} -S -2000')
 
 
 def _subcommand_stop():
