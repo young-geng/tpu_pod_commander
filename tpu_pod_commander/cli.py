@@ -301,6 +301,7 @@ def _subcommand_reboot():
 def main(args):
     if args.config_file != '':
         with mlxu.open_file(args.config_file, 'r') as f:
+            __file__ = os.path.abspath(args.config_file)
             exec(f.read())
 
     if FLAGS.launch_script_path is not None:
