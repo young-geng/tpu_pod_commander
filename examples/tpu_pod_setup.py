@@ -8,8 +8,7 @@ tpc launch tpu_pod_setup.py
 
 # Defines the bash script that will be executed on the TPU instance to set up
 # the environment.
-launch_script = """
-#! /bin/bash
+launch_script = r"""#! /bin/bash
 
 sudo apt-get update && sudo apt-get install -y \
     build-essential \

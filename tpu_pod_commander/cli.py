@@ -290,7 +290,7 @@ def _subcommand_stop():
     _assert_flags(
         tmux_session_name=True,
     )
-    _ssh_run_command(f'tmux kill-session -t {FLAGS.tmux_session_name}')
+    _ssh_run_command(f'tmux kill-session -t {FLAGS.tmux_session_name} || :')
 
 
 def _subcommand_reboot():
@@ -352,9 +352,13 @@ def main(args):
             _subcommand_stop()
         case 'reboot':
             _subcommand_reboot()
+        case 'relaunch':
+            _subcommand_stop()
+            time.sleep(1)
+            _subcommand_launch()
         case 'upload+launch':
             _subcommand_upload()
-            time.sleep(2)
+            time.sleep(1)
             _subcommand_launch()
 
 
@@ -382,7 +386,8 @@ def _parse_flags(argv):
             'check',
             'stop',
             'reboot',
-            'upload+launch'
+            'relaunch',
+            'upload+launch',
         ],
         help='Action to execute',
     )

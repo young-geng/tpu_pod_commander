@@ -8,8 +8,7 @@ tpc upload+launch run_job.py
 
 # Defines the bash script that will be executed on the TPU instance to set up
 # the environment.
-launch_script = """
-#! /bin/bash
+launch_script = r"""#! /bin/bash
 
 python /path/to/my/python/job.py
 
