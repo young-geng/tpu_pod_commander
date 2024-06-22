@@ -16,6 +16,7 @@ FLAGS, FLAGS_DEF = mlxu.define_flags_with_default(
     reserved=bool,
     spot=bool,
     upload_path=str,
+    upload_remove_remote=bool,
     command=str,
     launch_script_path=str,
     launch_script=str,
@@ -212,6 +213,8 @@ def _subcommand_upload():
     )
     for path in FLAGS.upload_path.split(','):
         local_path, remote_path = path.split(':')
+        if FLAGS.upload_remove_remote:
+            _ssh_run_command(f'rm -rf {remote_path}')
         _execute_shell(
             f'gcloud alpha compute tpus tpu-vm scp '
             f'{local_path} '
@@ -315,6 +318,8 @@ def main(args):
         FLAGS.spot = False
     if FLAGS.tpu_user is None:
         FLAGS.tpu_user = os.environ['USER']
+    if FLAGS.upload_remove_remote is None:
+        FLAGS.upload_remove_remote = True
     if FLAGS.tmux_session_name is None:
         FLAGS.tmux_session_name = 'tpc'
     if FLAGS.show_command is None:

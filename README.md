@@ -66,6 +66,7 @@ The following is a list of available paramters:
 - `reserved`: Whether the TPU pod should be created under reserved quota, default to `False`.
 - `spot`: Whether the TPU pod should be created as a preemptible instance, default to `False`.
 - `upload_path`: a comma-separated list of `<local path>:<remote path>` pairs to upload.
+- `upload_remove_remote`: Whether to remove the remote files before uploading. Default to `True`.
 - `command`: The command to run on the TPU pod.
 - `launch_script_path`: The path to load the content of the launch script.
 - `launch_script`: The content of the launch script. When both `launch_script_path`
