@@ -10,6 +10,7 @@ tpc upload+launch run_job.py
 # the environment.
 launch_script = r"""#! /bin/bash
 
+source ~/miniforge3/bin/activate mintext
 python /path/to/my/python/job.py
 
 read # This will pause the script so tmux session will not close immediately
@@ -17,7 +18,8 @@ read # This will pause the script so tmux session will not close immediately
 
 
 # Specify all the parameters to TPC via the configure_tpc function
-configure_tpc(
+# Change these acchording to your project and zone and TPU pod name
+configure_tpc( # type: ignore
     project='my-gcp-project',
     zone='europe-west4-b',
     name='my-tpu-pod',
