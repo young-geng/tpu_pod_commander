@@ -38,6 +38,8 @@ The following is a list of available actions:
 - `check`: Check the status of a job running in the tmux session on a TPU pod.
 - `stop`: Stop a job running in the tmux session on a TPU pod.
 - `reboot`: Reboot all the hosts in a TPU pod.
+- `unlock`: Remove the libtpu lock files on all hosts of a TPU pod.
+- `relaunch`: Perform `stop` and `launch` actions in sequence.
 - `upload+launch`: Perform `upload` and `launch` actions in sequence.
 
 
@@ -97,6 +99,8 @@ parameters for each action:
 - **`check`**: `zone`, `project`, `name`.
 - **`stop`**: `zone`, `project`, `name`.
 - **`reboot`**: `zone`, `project`, `name`.
+- **`unlock`**: `zone`, `project`, `name`.
+- **`relaunch`**: `zone`, `project`, `name`, `launch_script_path` or `launch_script`.
 - **`upload+launch`**: `zone`, `project`, `name`, `upload_path`, `launch_script_path` or `launch_script`.
 
 

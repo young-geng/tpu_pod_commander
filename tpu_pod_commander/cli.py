@@ -300,6 +300,9 @@ def _subcommand_reboot():
     _ssh_run_command(f'tmux new-session -d -s reboot sudo reboot')
 
 
+def _subcommand_unlock():
+    _ssh_run_command(f'sudo rm -rf /tmp/libtpu_lockfile && sudo rm -rf /tmp/tpu_logs')
+
 
 def main(args):
     if args.config_file != '':
@@ -357,6 +360,8 @@ def main(args):
             _subcommand_stop()
         case 'reboot':
             _subcommand_reboot()
+        case 'unlock':
+            _subcommand_unlock()
         case 'relaunch':
             _subcommand_stop()
             time.sleep(1)
@@ -391,6 +396,7 @@ def _parse_flags(argv):
             'check',
             'stop',
             'reboot',
+            'unlock',
             'relaunch',
             'upload+launch',
         ],
