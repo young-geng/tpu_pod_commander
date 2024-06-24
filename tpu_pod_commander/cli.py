@@ -365,7 +365,13 @@ def main(args):
         case 'relaunch':
             _subcommand_stop()
             time.sleep(1)
+            _subcommand_unlock()
+            time.sleep(1)
             _subcommand_launch()
+        case 'stop+unlock':
+            _subcommand_stop()
+            time.sleep(1)
+            _subcommand_unlock()
         case 'upload+launch':
             _subcommand_upload()
             time.sleep(1)
@@ -398,6 +404,7 @@ def _parse_flags(argv):
             'reboot',
             'unlock',
             'relaunch',
+            'stop+unlock',
             'upload+launch',
         ],
         help='Action to execute',
